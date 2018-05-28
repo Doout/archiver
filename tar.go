@@ -140,18 +140,17 @@ func tarFile(tarWriter *tar.Writer, source, dest string) error {
 			return fmt.Errorf("error walking to %s: %v", path, err)
 		}
 		link, e := os.Readlink(path)
+		orgPath := path
 		if e == nil {
 			path = link
 		}
 
-		
 		header, err := tar.FileInfoHeader(info, path)
 		if err != nil {
 			return fmt.Errorf("%s: making header: %v", path, err)
 		}
-
 		if baseDir != "" {
-			header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, source))
+			header.Name = filepath.Join(baseDir, strings.TrimPrefix(orgPath, source))
 		}
 
 		if header.Name == dest {
@@ -162,7 +161,6 @@ func tarFile(tarWriter *tar.Writer, source, dest string) error {
 		if info.IsDir() {
 			header.Name += "/"
 		}
-
 		err = tarWriter.WriteHeader(header)
 		if err != nil {
 			return fmt.Errorf("%s: writing header: %v", path, err)
