@@ -139,11 +139,11 @@ func tarFile(tarWriter *tar.Writer, source, dest string) error {
 		if err != nil {
 			return fmt.Errorf("error walking to %s: %v", path, err)
 		}
-		if info.Mode()&os.ModeSymlink == os.ModeSymlink {
-			if link, e := filepath.EvalSymlinks(path); e == nil {
-				path = link
-			}
+		link, e := os.Readlink(path)
+		if e == nil {
+			path = link
 		}
+
 		
 		header, err := tar.FileInfoHeader(info, path)
 		if err != nil {
